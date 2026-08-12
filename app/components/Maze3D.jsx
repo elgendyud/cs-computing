@@ -187,6 +187,24 @@ function collideAxis(x, z, walls) {
   return false;
 }
 
+function resizeCanvasIfNeeded(gpu, canvas) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const w = Math.max(1, Math.floor(canvas.clientWidth * dpr));
+  const h = Math.max(1, Math.floor(canvas.clientHeight * dpr));
+  if (w === gpu.canvasWidth && h === gpu.canvasHeight) return;
+
+  canvas.width = w;
+  canvas.height = h;
+  gpu.depthTexture.destroy?.();
+  gpu.depthTexture = gpu.device.createTexture({
+    size: [w, h],
+    format: "depth24plus",
+    usage: GPUTextureUsage.RENDER_ATTACHMENT,
+  });
+  gpu.canvasWidth = w;
+  gpu.canvasHeight = h;
+}
+
 export default function Maze3D() {
   const canvasRef = useRef(null);
   const overlayRef = useRef(null);
@@ -206,7 +224,9 @@ export default function Maze3D() {
   const [solved, setSolved] = useState(false);
   const [genTick, setGenTick] = useState(0);
   const [showJoystick, setShowJoystick] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const joyKnobRef = useRef(null);
+  const containerRef = useRef(null);
 
   // regenerate maze + reset player whenever genTick changes
   useEffect(() => {
@@ -470,6 +490,8 @@ export default function Maze3D() {
 
       const gpu = gpuRef.current;
       if (gpu) {
+        resizeCanvasIfNeeded(gpu, canvasRef.current);
+
         const pitch = pitchRef.current;
         const forward = [
           Math.sin(yaw) * Math.cos(pitch),
@@ -519,6 +541,51 @@ export default function Maze3D() {
     setGenTick((t) => t + 1);
   }
 
+  // keep isFullscreen in sync if the user exits via Esc, back gesture, etc.
+  useEffect(() => {
+    function onFsChange() {
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+      if (!fsEl) setIsFullscreen(false);
+    }
+    document.addEventListener("fullscreenchange", onFsChange);
+    document.addEventListener("webkitfullscreenchange", onFsChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFsChange);
+      document.removeEventListener("webkitfullscreenchange", onFsChange);
+    };
+  }, []);
+
+  // prevent the page behind from scrolling while the CSS fullscreen overlay is up
+  useEffect(() => {
+    document.body.style.overflow = isFullscreen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [isFullscreen]);
+
+  async function toggleFullscreen() {
+    const el = containerRef.current;
+    if (!isFullscreen) {
+      // best-effort: real Fullscreen API (hides browser chrome on desktop/Android).
+      // iOS Safari/Chrome don't support it on plain elements — the CSS overlay
+      // below still gives a fullscreen-looking view there, just with the
+      // address bar present, since WebKit only allows true fullscreen on <video>.
+      try {
+        if (el?.requestFullscreen) await el.requestFullscreen();
+        else if (el?.webkitRequestFullscreen) el.webkitRequestFullscreen();
+      } catch (e) {
+        // ignore — CSS overlay still applies
+      }
+      setIsFullscreen(true);
+    } else {
+      try {
+        if (document.fullscreenElement && document.exitFullscreen) await document.exitFullscreen();
+        else if (document.webkitFullscreenElement && document.webkitExitFullscreen) document.webkitExitFullscreen();
+      } catch (e) {
+        // ignore
+      }
+      setIsFullscreen(false);
+    }
+  }
+
   if (status === "unsupported") {
     return (
       <div className="panel game-wrap">
@@ -531,7 +598,10 @@ export default function Maze3D() {
   }
 
   return (
-    <div className="panel game-wrap">
+    <div
+      ref={containerRef}
+      className={`panel game-wrap${isFullscreen ? " maze-fullscreen" : ""}`}
+    >
       <p className={`game-status ${solved ? "win" : ""}`}>
         {status !== "ready"
           ? "Initializing WebGPU…"
@@ -571,6 +641,9 @@ export default function Maze3D() {
       <div className="game-controls">
         <button className="small-btn" onClick={newMaze}>
           New Maze
+        </button>
+        <button className="small-btn" onClick={toggleFullscreen}>
+          {isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
         </button>
       </div>
     </div>
