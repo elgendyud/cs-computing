@@ -11,12 +11,12 @@ export default function Page() {
 
   return (
     <main className="page">
-      <p className="eyebrow">AAST - Intro to Computing - Spring 2026 </p>
-      <h1>Unlock GPU Computing with WebGPU</h1>
-      <h2>by: Mohamed Bakr - Ashraf Sabry</h2>
-      <h2>Submitted for: Prof. Dr. Hatem Khater</h2>
+      <p className="eyebrow">System Readout</p>
+      <h1>What this device tells the browser</h1>
       <p className="sub">
-WebGPU is a cutting-edge web API that unleashes the full potential of modern local graphics hardware directly within your browser.
+        Everything below comes straight from your own browser's APIs — nothing is sent
+        anywhere except the public-IP lookup, which needs a server round trip by
+        definition.
       </p>
 
       <DeviceInfo onReady={() => setReady(true)} />
@@ -41,7 +41,9 @@ WebGPU is a cutting-edge web API that unleashes the full potential of modern loc
       {playing && <Maze3D key={gameKey} />}
 
       <p className="footnote">
-        Some data wouldn't be available due to user's permissions
+        Device name isn't shown because no browser API exposes it — that's a deliberate
+        privacy boundary, not a bug here. RAM, GPU, and network type are best-effort:
+        some browsers withhold or approximate them for the same reason.
       </p>
     </main>
   );

@@ -175,6 +175,7 @@ export default function DeviceInfo({ onReady }) {
       <div className="section-title">Software</div>
       <div className="grid-cols">
         <Field k="Browser" v={info.browser} />
+        <Field k="User agent" v={info.userAgent} />
         <Field k="Platform" v={info.platform} />
         <Field k="Languages" v={info.languages} />
         <Field k="Timezone" v={info.timezone} />
@@ -185,6 +186,12 @@ export default function DeviceInfo({ onReady }) {
 
       <div className="section-title">Hardware</div>
       <div className="grid-cols">
+        <Field
+          k="Device name"
+          v="Not exposed by browsers (privacy)"
+          tone="dim"
+        />
+        <Field k="Device model" v={info.deviceModel || "Not exposed by this browser"} tone={info.deviceModel ? "" : "dim"} />
         <Field k="CPU cores (logical)" v={info.cores} />
         <Field
           k="RAM"
