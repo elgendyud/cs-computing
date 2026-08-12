@@ -11,13 +11,10 @@ export default function Page() {
 
   return (
     <main className="page">
-      <p className="eyebrow">System Readout</p>
-      <h1>What this device tells the browser</h1>
-      <p className="sub">
-        Everything below comes straight from your own browser's APIs — nothing is sent
-        anywhere except the public-IP lookup, which needs a server round trip by
-        definition.
-      </p>
+      <p >AASTMT - intro to Computing - Spring 2026</p>
+      <h2>By: Mohamed Bakr - Ashraf Sabry</h2>
+      <h2>Submitted for: Prof. Dr. Hatem Khater</h2>
+
 
       <DeviceInfo onReady={() => setReady(true)} />
 
@@ -41,9 +38,7 @@ export default function Page() {
       {playing && <Maze3D key={gameKey} />}
 
       <p className="footnote">
-        Device name isn't shown because no browser API exposes it — that's a deliberate
-        privacy boundary, not a bug here. RAM, GPU, and network type are best-effort:
-        some browsers withhold or approximate them for the same reason.
+        Some data might fails to fetched due to Device Restrictions
       </p>
     </main>
   );

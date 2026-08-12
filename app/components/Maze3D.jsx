@@ -591,7 +591,7 @@ export default function Maze3D() {
       <div className="panel game-wrap">
         <p className="game-status">
           WebGPU isn't available in this browser/device. Try a recent Chrome, Edge, or
-          Safari with WebGPU enabled, served over HTTPS.
+          Safari with WebGPU enabled.
         </p>
       </div>
     );
@@ -606,8 +606,8 @@ export default function Maze3D() {
         {status !== "ready"
           ? "Initializing WebGPU…"
           : solved
-          ? "You reached the exit 🎉"
-          : "Find the glowing exit — drag left half to move, right half to look (or WASD + arrows)"}
+          ? "You won 🎉"
+          : "Find the exit"}
       </p>
       <div className="canvas-stage" style={{ aspectRatio: "4 / 3", touchAction: "none" }}>
         <canvas ref={canvasRef} style={{ touchAction: "none" }} />

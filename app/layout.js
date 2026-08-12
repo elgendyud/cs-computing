@@ -1,7 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "Device Readout",
+  title: "AASTMT - intro to Comptuing",
   description: "Live hardware & software readout of your device, plus a WebGPU puzzle.",
 };
 
